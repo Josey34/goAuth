@@ -15,12 +15,16 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	_, err = factory.New(cfg)
+	f, err := factory.New(cfg)
 	if err != nil {
 		log.Fatalf("Failed to create factory: %v", err)
 	}
 
 	r := gin.Default()
+
+	api := r.Group("/api")
+	auth := api.Group("/auth")
+	auth.POST("/register", f.AuthHandler.Register)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})

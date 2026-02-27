@@ -25,6 +25,7 @@ func main() {
 	api := r.Group("/api")
 	auth := api.Group("/auth")
 	auth.POST("/register", f.AuthHandler.Register)
+	auth.POST("/login", f.AuthHandler.Login)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})

@@ -7,6 +7,7 @@ import (
 	"goauth/database"
 	"goauth/handler"
 	"goauth/repository"
+	"goauth/service"
 	"goauth/usecase"
 )
 
@@ -22,7 +23,8 @@ func New(cfg *config.Config) (*Factory, error) {
 	}
 
 	userRepo := repository.NewSQLiteUserRepo(db)
-	authUsecase := usecase.NewAuthUsecase(userRepo, cfg.BcryptCost)
+	tokenService := service.NewJWTTokenService(cfg.JWTSecret, cfg.AccessTTL, cfg.RefreshTTL)
+	authUsecase := usecase.NewAuthUsecase(userRepo, cfg.BcryptCost, tokenService)
 	authHandler := handler.NewAuthHandler(authUsecase)
 
 	return &Factory{

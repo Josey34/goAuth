@@ -4,6 +4,7 @@ import (
 	"goauth/entity"
 	"goauth/errors"
 	"goauth/repository"
+	"goauth/service"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -11,17 +12,20 @@ import (
 
 type AuthUsecase interface {
 	Register(email, password, name string) (*entity.User, error)
+	Login(email, password string) (*entity.User, string, string, error)
 }
 
 type AuthUsecaseImpl struct {
-	userRepo   repository.UserRepository
-	bcryptCost int
+	userRepo     repository.UserRepository
+	bcryptCost   int
+	tokenService service.TokenService
 }
 
-func NewAuthUsecase(userRepo repository.UserRepository, bcryptCost int) AuthUsecase {
+func NewAuthUsecase(userRepo repository.UserRepository, bcryptCost int, tokenService service.TokenService) AuthUsecase {
 	return &AuthUsecaseImpl{
-		userRepo:   userRepo,
-		bcryptCost: bcryptCost,
+		userRepo:     userRepo,
+		bcryptCost:   bcryptCost,
+		tokenService: tokenService,
 	}
 }
 
@@ -47,4 +51,30 @@ func (a *AuthUsecaseImpl) Register(email, password, name string) (*entity.User, 
 	}
 
 	return createdUser, nil
+}
+
+func (a *AuthUsecaseImpl) Login(email, password string) (*entity.User, string, string, error) {
+	trimEmail := strings.TrimSpace(email)
+	lowerEmail := strings.ToLower(trimEmail)
+
+	userFound, err := a.userRepo.FindByEmail(lowerEmail)
+	if err != nil {
+		return nil, "", "", errors.AuthError{Message: "Invalid email or password"}
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(userFound.PasswordHash), []byte(password)); err != nil {
+		return nil, "", "", errors.AuthError{Message: "Invalid email or password"}
+	}
+
+	accessToken, err := a.tokenService.GenerateAccess(userFound.ID, userFound.Role)
+	if err != nil {
+		return nil, "", "", errors.AuthError{Message: "Failed to generate access token"}
+	}
+
+	refreshToken, err := a.tokenService.GenerateRefresh(userFound.ID, userFound.Role)
+	if err != nil {
+		return nil, "", "", errors.AuthError{Message: "Failed to generate refresh token"}
+	}
+
+	return userFound, accessToken, refreshToken, nil
 }

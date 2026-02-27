@@ -24,7 +24,7 @@ func (r *SQLiteUserRepo) Insert(email, name, passwordHash string) (*entity.User,
 
 	_, err := r.db.Exec(
 		"INSERT INTO users (id, email, username, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-		userId, email, email, passwordHash, "user", now,
+		userId, email, name, passwordHash, "user", now,
 	)
 	if err != nil {
 		log.Printf("DEBUG: Insert failed - %v", err)

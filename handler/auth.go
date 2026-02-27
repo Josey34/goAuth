@@ -38,3 +38,27 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, userResp)
 }
+
+func (h *AuthHandler) Login(c *gin.Context) {
+	var req dto.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		statusCode := errors.ToHTTPStatus(err)
+		c.JSON(statusCode, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	user, accessToken, refreshToken, err := h.authUsecase.Login(req.Email, req.Password)
+	if err != nil {
+		statusCode := errors.ToHTTPStatus(err)
+		c.JSON(statusCode, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	userResp := &dto.TokenResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		User:         dto.FromEntity(user),
+	}
+
+	c.JSON(http.StatusOK, userResp)
+}

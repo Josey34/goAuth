@@ -12,8 +12,9 @@ import (
 )
 
 type Factory struct {
-	DB          *sql.DB
-	AuthHandler *handler.AuthHandler
+	DB           *sql.DB
+	AuthHandler  *handler.AuthHandler
+	TokenService service.TokenService
 }
 
 func New(cfg *config.Config) (*Factory, error) {
@@ -28,7 +29,8 @@ func New(cfg *config.Config) (*Factory, error) {
 	authHandler := handler.NewAuthHandler(authUsecase)
 
 	return &Factory{
-		DB:          db,
-		AuthHandler: authHandler,
+		DB:           db,
+		AuthHandler:  authHandler,
+		TokenService: tokenService,
 	}, nil
 }

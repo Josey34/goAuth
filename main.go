@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goauth/config"
 	"goauth/factory"
+	"goauth/middleware"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,14 @@ func main() {
 	auth := api.Group("/auth")
 	auth.POST("/register", f.AuthHandler.Register)
 	auth.POST("/login", f.AuthHandler.Login)
+
+	protected := api.Group("/protected")
+	protected.Use(middleware.Auth(f.TokenService))
+	protected.GET("/profile", func(ctx *gin.Context) {
+		userID := ctx.GetString("userID")
+		userRole := ctx.GetString("userRole")
+		ctx.JSON(200, gin.H{"user_id": userID, "role": userRole})
+	})
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})

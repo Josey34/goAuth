@@ -73,3 +73,15 @@ func (r *SQLiteUserRepo) FindByID(id string) (*entity.User, error) {
 	}
 	return user, nil
 }
+
+func (r *SQLiteUserRepo) Update(id, name string) (*entity.User, error) {
+	_, err := r.db.Exec(
+		"UPDATE users SET username = ? WHERE id = ?",
+		name, id,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error updating user: %w", err)
+	}
+
+	return r.FindByID(id)
+}

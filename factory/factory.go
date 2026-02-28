@@ -15,6 +15,7 @@ type Factory struct {
 	DB           *sql.DB
 	AuthHandler  *handler.AuthHandler
 	TokenService service.TokenService
+	UserHandler  *handler.UserHandler
 }
 
 func New(cfg *config.Config) (*Factory, error) {
@@ -27,10 +28,13 @@ func New(cfg *config.Config) (*Factory, error) {
 	tokenService := service.NewJWTTokenService(cfg.JWTSecret, cfg.AccessTTL, cfg.RefreshTTL)
 	authUsecase := usecase.NewAuthUsecase(userRepo, cfg.BcryptCost, tokenService)
 	authHandler := handler.NewAuthHandler(authUsecase)
+	userUsecase := usecase.NewUserUsecase(userRepo)
+	userHandler := handler.NewUserHandler(userUsecase)
 
 	return &Factory{
 		DB:           db,
 		AuthHandler:  authHandler,
 		TokenService: tokenService,
+		UserHandler:  userHandler,
 	}, nil
 }

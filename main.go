@@ -28,13 +28,10 @@ func main() {
 	auth.POST("/register", f.AuthHandler.Register)
 	auth.POST("/login", f.AuthHandler.Login)
 
-	protected := api.Group("/protected")
+	protected := api.Group("/auth")
 	protected.Use(middleware.Auth(f.TokenService))
-	protected.GET("/profile", func(ctx *gin.Context) {
-		userID := ctx.GetString("userID")
-		userRole := ctx.GetString("userRole")
-		ctx.JSON(200, gin.H{"user_id": userID, "role": userRole})
-	})
+	protected.GET("/profile", f.UserHandler.GetProfile)
+	protected.PUT("/profile", f.UserHandler.UpdateProfile)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})

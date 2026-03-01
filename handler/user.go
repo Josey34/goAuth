@@ -49,3 +49,12 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	userResp := dto.FromEntity(user)
 	c.JSON(http.StatusOK, userResp)
 }
+
+func (h *UserHandler) AdminDashboard(ctx *gin.Context) {
+	userID := ctx.GetString("userID")
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Welcome to admin dashboard",
+		"user_id": userID,
+		"data":    "Admin-only content",
+	})
+}

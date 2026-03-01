@@ -33,6 +33,11 @@ func main() {
 	protected.GET("/profile", f.UserHandler.GetProfile)
 	protected.PUT("/profile", f.UserHandler.UpdateProfile)
 
+	admin := api.Group("/admin")
+	admin.Use(middleware.Auth(f.TokenService))
+	admin.Use(middleware.RequireRole("admin"))
+	admin.GET("/dashboard", f.UserHandler.AdminDashboard)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})
 	})

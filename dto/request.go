@@ -14,3 +14,7 @@ type LoginRequest struct {
 type UpdateProfileRequest struct {
 	Name string `json:"name" binding:"required"`
 }
+
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}

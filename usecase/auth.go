@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"goauth/entity"
 	"goauth/errors"
 	"goauth/repository"
@@ -13,6 +14,7 @@ import (
 type AuthUsecase interface {
 	Register(email, password, name string) (*entity.User, error)
 	Login(email, password string) (*entity.User, string, string, error)
+	Refresh(refreshToken string) (string, error)
 }
 
 type AuthUsecaseImpl struct {
@@ -77,4 +79,26 @@ func (a *AuthUsecaseImpl) Login(email, password string) (*entity.User, string, s
 	}
 
 	return userFound, accessToken, refreshToken, nil
+}
+
+func (a *AuthUsecaseImpl) Refresh(refreshToken string) (string, error) {
+	claims, err := a.tokenService.Validate(refreshToken)
+	if err != nil {
+		return "", errors.AuthError{Message: "Invalid refresh token"}
+	}
+
+	tokenType, ok := claims["type"].(string)
+	if !ok || tokenType != "refresh" {
+		return "", errors.AuthError{Message: "Invalid token type"}
+	}
+
+	userID := fmt.Sprintf("%v", claims["sub"])
+	role := fmt.Sprintf("%v", claims["role"])
+
+	accessToken, err := a.tokenService.GenerateAccess(userID, role)
+	if err != nil {
+		return "", errors.AuthError{Message: "Failed to generate access token"}
+	}
+
+	return accessToken, nil
 }

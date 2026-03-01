@@ -27,6 +27,7 @@ func main() {
 	auth := api.Group("/auth")
 	auth.POST("/register", f.AuthHandler.Register)
 	auth.POST("/login", f.AuthHandler.Login)
+	auth.POST("/refresh", f.AuthHandler.Refresh)
 
 	protected := api.Group("/auth")
 	protected.Use(middleware.Auth(f.TokenService))

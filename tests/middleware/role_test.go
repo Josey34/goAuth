@@ -52,13 +52,10 @@ func TestRequireRole(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
 
-			// Set the user role in context (simulating Auth middleware)
 			c.Set("userRole", tt.userRole)
 
-			// Call middleware
 			roleMiddleware(c)
 
-			// Check if context was aborted for error cases
 			if tt.expectError && !c.IsAborted() {
 				t.Errorf("expected context to be aborted for error case")
 			}
@@ -66,7 +63,6 @@ func TestRequireRole(t *testing.T) {
 				t.Errorf("expected context NOT to be aborted for success case")
 			}
 
-			// For error cases, verify response was written
 			if tt.expectError && w.Body.Len() == 0 {
 				t.Errorf("expected error response but got empty body")
 			}

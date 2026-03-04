@@ -6,7 +6,7 @@ import (
 )
 
 type MockUserRepository struct {
-	Users map[string]*entity.User // keyed by ID
+	Users map[string]*entity.User
 }
 
 func NewMockUserRepository() *MockUserRepository {
@@ -16,9 +16,8 @@ func NewMockUserRepository() *MockUserRepository {
 }
 
 func (m *MockUserRepository) Insert(email, name, passwordHash string) (*entity.User, error) {
-	// Use email as a simple ID for testing
 	user := &entity.User{
-		ID:           email, // Use email as ID for consistency
+		ID:           email,
 		Email:        email,
 		Name:         name,
 		PasswordHash: passwordHash,

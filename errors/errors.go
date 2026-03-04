@@ -3,6 +3,8 @@ package errors
 import (
 	"errors"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type AuthError struct {
@@ -41,6 +43,11 @@ func ToHTTPStatus(err error) int {
 	var authErr AuthError
 	if errors.As(err, &authErr) {
 		return http.StatusUnauthorized
+	}
+
+	var validationErrors validator.ValidationErrors
+	if errors.As(err, &validationErrors) {
+		return http.StatusBadRequest
 	}
 
 	var valErr ValidationError

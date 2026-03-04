@@ -23,7 +23,8 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	var req dto.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		statusCode := errors.ToHTTPStatus(err)
-		c.JSON(statusCode, dto.ErrorResponse{Error: err.Error()})
+		fieldErrors := extractFieldErrors(err)
+		c.JSON(statusCode, dto.ErrorResponse{Error: "validation failed", Details: fieldErrors})
 		return
 	}
 
@@ -43,7 +44,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		statusCode := errors.ToHTTPStatus(err)
-		c.JSON(statusCode, dto.ErrorResponse{Error: err.Error()})
+		fieldErrors := extractFieldErrors(err)
+		c.JSON(statusCode, dto.ErrorResponse{Error: "validation failed", Details: fieldErrors})
 		return
 	}
 
@@ -67,7 +69,8 @@ func (h *AuthHandler) Refresh(ctx *gin.Context) {
 	var req dto.RefreshTokenRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		statusCode := errors.ToHTTPStatus(err)
-		ctx.JSON(statusCode, dto.ErrorResponse{Error: err.Error()})
+		fieldErrors := extractFieldErrors(err)
+		ctx.JSON(statusCode, dto.ErrorResponse{Error: "validation failed", Details: fieldErrors})
 		return
 	}
 

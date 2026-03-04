@@ -53,21 +53,17 @@ func TestAuthMiddleware(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
 
-			// Call middleware
 			authMiddleware := middleware.Auth(mockToken)
 			authMiddleware(c)
 
-			// Check if context was aborted for error cases
 			if tt.expectError && !c.IsAborted() {
 				t.Errorf("expected context to be aborted for error case")
 			}
 
-			// For successful cases, check context was populated
 			if !tt.expectError && c.GetString("userID") == "" {
 				t.Errorf("expected userID in context but got empty")
 			}
 
-			// For error cases, verify response contains error message
 			if tt.expectError && w.Body.Len() == 0 {
 				t.Errorf("expected error response but got empty body")
 			}

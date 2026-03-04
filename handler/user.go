@@ -2,6 +2,7 @@ package handler
 
 import (
 	"goauth/dto"
+	"goauth/errors"
 	"goauth/usecase"
 	"net/http"
 
@@ -23,7 +24,8 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 
 	user, err := h.UserUsecase.GetProfile(userID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "User not found"})
+		statusCode := errors.ToHTTPStatus(err)
+		c.JSON(statusCode, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 
@@ -33,16 +35,18 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	var req dto.UpdateProfileRequest
-
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		statusCode := errors.ToHTTPStatus(err)
+		fieldErrors := extractFieldErrors(err)
+		c.JSON(statusCode, dto.ErrorResponse{Error: "validation failed", Details: fieldErrors})
 		return
 	}
 
 	userID := c.GetString("userID")
 	user, err := h.UserUsecase.UpdateProfile(userID, req.Name)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "User not found"})
+		statusCode := errors.ToHTTPStatus(err)
+		c.JSON(statusCode, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 

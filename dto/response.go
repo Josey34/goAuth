@@ -21,11 +21,17 @@ func FromEntity(u *entity.User) *UserResponse {
 }
 
 type ErrorResponse struct {
-	Error string `json:"error"`
+	Error   string       `json:"error"`
+	Details []FieldError `json:"details,omitempty"`
 }
 
 type TokenResponse struct {
 	AccessToken  string        `json:"access_token"`
 	RefreshToken string        `json:"refresh_token"`
 	User         *UserResponse `json:"user"`
+}
+
+type FieldError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
 }

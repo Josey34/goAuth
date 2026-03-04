@@ -54,7 +54,6 @@ func TestRegisterHandler(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			w := httptest.NewRecorder()
 
-			// Create actual Gin context
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
 
@@ -94,7 +93,6 @@ func TestLoginHandler(t *testing.T) {
 			mockToken := mock_test.NewMockTokenService()
 
 			if tt.name == "valid login" {
-				// Use actual bcrypt hash
 				hash, _ := generateBcryptHash("password123", 10)
 				mockRepo.Insert(tt.email, "Test User", hash)
 			}

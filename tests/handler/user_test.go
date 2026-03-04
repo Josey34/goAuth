@@ -55,7 +55,7 @@ func TestGetProfileHandler(t *testing.T) {
 
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
-			c.Set("userID", tt.email) // Use email as ID
+			c.Set("userID", tt.email)
 
 			userHandler.GetProfile(c)
 
@@ -124,8 +124,7 @@ func TestUpdateProfileHandler(t *testing.T) {
 
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
-			c.Set("userID", tt.email) // Use email as ID
-
+			c.Set("userID", tt.email)
 			userHandler.UpdateProfile(c)
 
 			if w.Code != tt.expectedStatus {

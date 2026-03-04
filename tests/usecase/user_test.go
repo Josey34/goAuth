@@ -37,7 +37,7 @@ func TestGetProfile(t *testing.T) {
 			}
 
 			userUsecase := usecase.NewUserUsecase(mockRepo)
-			user, err := userUsecase.GetProfile(tt.email) // Use email as ID
+			user, err := userUsecase.GetProfile(tt.email)
 
 			if tt.expectedError && err == nil {
 				t.Errorf("expected error but got none")
@@ -96,7 +96,7 @@ func TestUpdateProfile(t *testing.T) {
 			}
 
 			userUsecase := usecase.NewUserUsecase(mockRepo)
-			user, err := userUsecase.UpdateProfile(tt.email, tt.newName) // Use email as ID
+			user, err := userUsecase.UpdateProfile(tt.email, tt.newName)
 
 			if tt.expectedError && err == nil {
 				t.Errorf("expected error but got none")

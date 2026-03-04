@@ -39,6 +39,22 @@ func (e ConflictError) Error() string {
 	return e.Message
 }
 
+type ForbiddenError struct {
+	Message string
+}
+
+func (e ForbiddenError) Error() string {
+	return e.Message
+}
+
+type RateLimitError struct {
+	Message string
+}
+
+func (e RateLimitError) Error() string {
+	return e.Message
+}
+
 func ToHTTPStatus(err error) int {
 	var authErr AuthError
 	if errors.As(err, &authErr) {
@@ -63,6 +79,16 @@ func ToHTTPStatus(err error) int {
 	var conflict ConflictError
 	if errors.As(err, &conflict) {
 		return http.StatusConflict
+	}
+
+	var forbidden ForbiddenError
+	if errors.As(err, &forbidden) {
+		return http.StatusForbidden
+	}
+
+	var rateLimit RateLimitError
+	if errors.As(err, &rateLimit) {
+		return http.StatusTooManyRequests
 	}
 
 	return http.StatusInternalServerError

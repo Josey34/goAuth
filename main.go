@@ -8,6 +8,8 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
+	zlog "github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -16,12 +18,25 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if cfg.LogLevel == "debug" {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+
 	f, err := factory.New(cfg)
 	if err != nil {
 		log.Fatalf("Failed to create factory: %v", err)
 	}
 
+	rateLimiter := middleware.NewRateLimiter(cfg.RateLimitRPS, cfg.RateLimitBurst)
+
 	r := gin.Default()
+
+	r.Use(gin.Recovery())
+	r.Use(middleware.SecurityHeaders())
+	r.Use(middleware.CORS(cfg.AllowedOrigins))
+	r.Use(middleware.Logger(zlog.Logger))
+	r.Use(rateLimiter.Limit())
 
 	api := r.Group("/api")
 	auth := api.Group("/auth")

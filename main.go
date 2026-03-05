@@ -8,12 +8,19 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
+	zlog "github.com/rs/zerolog/log"
 )
 
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if cfg.LogLevel == "debug" {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
 	f, err := factory.New(cfg)
@@ -26,6 +33,7 @@ func main() {
 	r.Use(gin.Recovery())
 	r.Use(middleware.SecurityHeaders())
 	r.Use(middleware.CORS(cfg.AllowedOrigins))
+	r.Use(middleware.Logger(zlog.Logger))
 
 	api := r.Group("/api")
 	auth := api.Group("/auth")

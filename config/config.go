@@ -17,6 +17,7 @@ type Config struct {
 	RefreshTTL     time.Duration
 	BcryptCost     int
 	AllowedOrigins []string
+	LogLevel       string
 }
 
 func Load() (*Config, error) {
@@ -50,6 +51,10 @@ func Load() (*Config, error) {
 		allowedOrigins = "*"
 	}
 
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel == "" {
+		logLevel = "info"
+	}
 	return &Config{
 		Port:           port,
 		DBPath:         dbPath,
@@ -58,6 +63,7 @@ func Load() (*Config, error) {
 		RefreshTTL:     refreshTTL,
 		BcryptCost:     bcryptCost,
 		AllowedOrigins: strings.Split(allowedOrigins, ","),
+		LogLevel:       logLevel,
 	}, nil
 }
 

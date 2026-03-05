@@ -23,6 +23,10 @@ func main() {
 
 	r := gin.Default()
 
+	r.Use(gin.Recovery())
+	r.Use(middleware.SecurityHeaders())
+	r.Use(middleware.CORS(cfg.AllowedOrigins))
+
 	api := r.Group("/api")
 	auth := api.Group("/auth")
 	auth.POST("/register", f.AuthHandler.Register)

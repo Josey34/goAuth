@@ -10,12 +10,13 @@ import (
 )
 
 type Config struct {
-	Port       int
-	DBPath     string
-	JWTSecret  string
-	AccessTTL  time.Duration
-	RefreshTTL time.Duration
-	BcryptCost int
+	Port           int
+	DBPath         string
+	JWTSecret      string
+	AccessTTL      time.Duration
+	RefreshTTL     time.Duration
+	BcryptCost     int
+	AllowedOrigins []string
 }
 
 func Load() (*Config, error) {
@@ -44,13 +45,19 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
+	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
+	if allowedOrigins == "" {
+		allowedOrigins = "*"
+	}
+
 	return &Config{
-		Port:       port,
-		DBPath:     dbPath,
-		JWTSecret:  jwtSecret,
-		AccessTTL:  accessTTL,
-		RefreshTTL: refreshTTL,
-		BcryptCost: bcryptCost,
+		Port:           port,
+		DBPath:         dbPath,
+		JWTSecret:      jwtSecret,
+		AccessTTL:      accessTTL,
+		RefreshTTL:     refreshTTL,
+		BcryptCost:     bcryptCost,
+		AllowedOrigins: strings.Split(allowedOrigins, ","),
 	}, nil
 }
 

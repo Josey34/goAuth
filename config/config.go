@@ -18,6 +18,8 @@ type Config struct {
 	BcryptCost     int
 	AllowedOrigins []string
 	LogLevel       string
+	RateLimitRPS   float64
+	RateLimitBurst int
 }
 
 func Load() (*Config, error) {
@@ -55,6 +57,17 @@ func Load() (*Config, error) {
 	if logLevel == "" {
 		logLevel = "info"
 	}
+
+	rateLimitRPS, err := strconv.ParseFloat(os.Getenv("RATE_LIMIT_RPS"), 64)
+	if err != nil || rateLimitRPS == 0 {
+		rateLimitRPS = 10
+	}
+
+	rateLimitBurst, err := strconv.Atoi(os.Getenv("RATE_LIMIT_BURST"))
+	if err != nil || rateLimitBurst == 0 {
+		rateLimitBurst = 20
+	}
+
 	return &Config{
 		Port:           port,
 		DBPath:         dbPath,
@@ -64,6 +77,8 @@ func Load() (*Config, error) {
 		BcryptCost:     bcryptCost,
 		AllowedOrigins: strings.Split(allowedOrigins, ","),
 		LogLevel:       logLevel,
+		RateLimitRPS:   rateLimitRPS,
+		RateLimitBurst: rateLimitBurst,
 	}, nil
 }
 

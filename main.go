@@ -28,12 +28,15 @@ func main() {
 		log.Fatalf("Failed to create factory: %v", err)
 	}
 
+	rateLimiter := middleware.NewRateLimiter(cfg.RateLimitRPS, cfg.RateLimitBurst)
+
 	r := gin.Default()
 
 	r.Use(gin.Recovery())
 	r.Use(middleware.SecurityHeaders())
 	r.Use(middleware.CORS(cfg.AllowedOrigins))
 	r.Use(middleware.Logger(zlog.Logger))
+	r.Use(rateLimiter.Limit())
 
 	api := r.Group("/api")
 	auth := api.Group("/auth")
